@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hogar E&amp;M</title>
+<meta name="theme-color" content="#FBF5FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1421" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hogar E&amp;M">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una columna de app (máx. 880px), cabecera fija con pestañas. Paleta pastel rosa + lavanda. */
+:root{
+  --bg:#FBF5FA; --surface:#FFFFFF; --surface-2:#F4E9F5; --ink:#2F2236; --muted:#7A6684; --line:#ECDDEF;
+  --accent:#8C5FD0; --accent-ink:#FFFFFF; --accent-soft:#EEE4FB;
+  --pa:#7A55C4; --pa-soft:#ECE3FA; --pb:#CC4F87; --pb-soft:#FCE2EE; --both:#B0628F; --both-soft:#F8E4F0;
+  --warn:#C23F5C; --warn-soft:#FDE1E7; --ok:#3A8F68; --ok-soft:#DDF2E6;
+  --f-display:"Fredoka", "Avenir Next", system-ui, sans-serif;
+  --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:16px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#1B1421; --surface:#241B2B; --surface-2:#2F2437; --ink:#F3E9F6; --muted:#B9A5C2; --line:#3B2E45;
+  --accent:#C6A2F4; --accent-ink:#1B1421; --accent-soft:#36284A;
+  --pa:#BB9EF0; --pa-soft:#33284A; --pb:#F59CC4; --pb-soft:#46253A; --both:#E7A9CC; --both-soft:#3F2638;
+  --warn:#F48FA3; --warn-soft:#46222C; --ok:#7FD3A6; --ok-soft:#1E3A2C; color-scheme:dark;}}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top-in{max-width:880px;margin:0 auto;padding-block:12px 0;display:grid;gap:10px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand h1{font-size:22px;font-weight:750;display:flex;align-items:center;gap:10px}
+.mark{width:28px;height:28px;flex:none}
+.whoami{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-bottom:-1px}
+nav::-webkit-scrollbar{display:none}
+nav a{padding:9px 12px 11px;color:var(--muted);text-decoration:none;font-weight:600;border-bottom:2.5px solid transparent;white-space:nowrap;display:flex;gap:6px;align-items:center}
+nav a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--accent)}
+nav .badge{font-size:11px;min-width:18px;padding:1px 6px;border-radius:99px;background:var(--surface-2);color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+nav .badge.hot{background:var(--warn-soft);color:var(--warn)}
+
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 80px}
+.wrap{max-width:880px;margin:0 auto;display:grid;gap:22px}
+.status{font-size:13px;padding:8px 12px;border-radius:10px;background:var(--both-soft);color:var(--ink)}
+.status:empty{display:none}
+
+.sec{display:grid;gap:12px}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sec-h h2{font-size:19px;font-weight:750}
+.sub{color:var(--muted);font-size:13px}
+.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-weight:700;color:var(--muted)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.form{display:flex;flex-wrap:wrap;gap:8px;padding:12px}
+.form > *{min-width:0}
+.grow{flex:1 1 200px}
+input[type=text],input[type=number],input[type=date],select{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 11px;min-height:40px;width:100%}
+.form select,.form input[type=date],.form input[type=number]{width:auto}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 14px;min-height:40px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{min-height:32px;padding:4px 10px;font-size:13px}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+.btn.armed{background:var(--warn);border-color:var(--warn);color:#fff}
+.x{width:32px;height:32px;border-radius:8px;border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;flex:none}
+.x:hover{background:var(--warn-soft);color:var(--warn)}
+.x.armed{background:var(--warn);color:#fff;width:auto;padding:0 8px;font-size:12px;font-weight:700}
+
+.seg{display:inline-flex;background:var(--surface-2);border-radius:99px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:99px;padding:5px 12px;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .12)}
+
+.who{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:2px 9px 2px 7px;border-radius:99px;white-space:nowrap}
+.who::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.who-a{background:var(--pa-soft);color:var(--pa)} .who-b{background:var(--pb-soft);color:var(--pb)} .who-ambos{background:var(--both-soft);color:var(--both)}
+.chip{font-size:12px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--surface-2);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.chip.late{background:var(--warn-soft);color:var(--warn)} .chip.today{background:var(--both-soft);color:var(--both)} .chip.ok{background:var(--ok-soft);color:var(--ok)}
+
+.list{list-style:none;margin:0;padding:0}
+.list > li{display:flex;align-items:center;gap:12px;padding:11px 12px;border-top:1px solid var(--line)}
+.list > li:first-child{border-top:0}
+.li-main{flex:1;min-width:0;display:grid;gap:3px}
+.li-title{font-weight:600;overflow-wrap:anywhere}
+.li-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px;color:var(--muted)}
+.done .li-title{text-decoration:line-through;color:var(--muted);font-weight:500}
+.check{appearance:none;width:22px;height:22px;border:2px solid var(--line);border-radius:7px;flex:none;cursor:pointer;display:grid;place-items:center;background:var(--surface)}
+.check:checked{background:var(--accent);border-color:var(--accent)}
+.check:checked::after{content:"";width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+
+.empty{padding:22px 16px;text-align:center;color:var(--muted);display:grid;gap:10px;justify-items:center}
+.empty strong{color:var(--ink);font-family:var(--f-display);font-size:16px}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;gap:2px;text-decoration:none;color:inherit}
+.stat:hover{border-color:var(--accent)}
+.stat b{font-family:var(--f-display);font-size:28px;font-weight:750;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.alert b{color:var(--warn)}
+
+details.more{border-top:1px solid var(--line)}
+details.more summary{padding:10px 12px;cursor:pointer;color:var(--muted);font-weight:600;font-size:13px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::before{content:"▸";margin-right:6px}
+details.more[open] summary::before{content:"▾"}
+details.more summary span{flex:1}
+
+.balance{display:grid;gap:6px;padding:12px}
+.bar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--surface-2)}
+.bar i{display:block;height:100%}
+.bar .a{background:var(--pa)} .bar .b{background:var(--pb)}
+.balance-legend{display:flex;justify-content:space-between;font-size:13px;font-variant-numeric:tabular-nums;gap:8px;flex-wrap:wrap}
+
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-top:0;vertical-align:bottom}
+th:first-child,td:first-child{text-align:left;white-space:normal;min-width:130px}
+td input[type=number]{width:92px;text-align:right;padding:6px 8px;min-height:34px}
+@media (max-width:460px){nav a{padding:9px 8px 11px;font-size:14px}}
+td.best input{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:700}
+.unit{display:block;font-size:12px;color:var(--muted)}
+.save{color:var(--ok);font-weight:700;font-size:13px}
+
+.basket{display:grid;gap:8px;padding:12px}
+.brow{display:grid;grid-template-columns:minmax(80px,140px) 1fr auto;gap:10px;align-items:center;font-size:14px}
+.brow .bar{height:12px}
+.brow .bar i{background:var(--muted);opacity:.5}
+.brow.win .bar i{background:var(--ok);opacity:1}
+.brow b{font-variant-numeric:tabular-nums}
+.brow small{color:var(--muted)}
+
+.storechips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.storechip{display:inline-flex;align-items:center;gap:2px;background:var(--surface-2);border-radius:99px;padding:2px 2px 2px 12px;font-weight:600;font-size:13px}
+.storechip .x{width:26px;height:26px;font-size:15px;border-radius:99px}
+
+.settings{display:grid;gap:12px;padding:12px}
+.settings label{display:grid;gap:4px;font-size:13px;color:var(--muted);font-weight:600}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
+.hint{color:var(--ok);font-weight:600}
+.login{display:grid;place-items:center;padding-block:4vh}
+.login-card{width:100%;max-width:400px;padding:28px 22px;display:grid;gap:12px;text-align:center;box-shadow:0 10px 40px -18px var(--pb)}
+.login-mark{width:72px;height:72px;margin:0 auto;border-radius:20px;background:var(--surface-2)}
+.login-card h2{font-size:24px}
+.login-form{display:grid;gap:12px;text-align:left;margin-top:6px}
+.login-form label{display:grid;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
+input[type=email],input[type=password]{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%;font-size:16px}
+.login-err{margin:0;color:var(--warn);font-size:14px;min-height:1.2em;text-align:center}
+.top{box-shadow:0 1px 0 var(--line)}
+.stat b{color:var(--accent)} .stat.alert b{color:var(--warn)}
+.view[hidden]{display:none}
+@media (prefers-reduced-motion:no-preference){.list > li{transition:background .15s}}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><path d="M4 13.5 14 5l10 8.5V24a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" fill="var(--accent)"/><circle cx="11" cy="17" r="3" fill="var(--pa)"/><circle cx="17" cy="17" r="3" fill="var(--pb)" opacity=".9"/></svg>Hogar E&amp;M</h1>
+      <div class="whoami" id="whoami" hidden><span>Soy</span><div class="seg" id="meSeg" role="group" aria-label="¿Quién eres?"></div><button type="button" class="btn small ghost" data-action="logout">Salir</button></div>
+    </div>
+    <nav id="nav" aria-label="Secciones" hidden>
+      <a href="#inicio" data-v="inicio">Inicio</a>
+      <a href="#pendientes" data-v="pendientes">Pendientes <span class="badge" id="b-pend"></span></a>
+      <a href="#aseo" data-v="aseo">Aseo <span class="badge" id="b-aseo"></span></a>
+      <a href="#compras" data-v="compras">Compras <span class="badge" id="b-comp"></span></a>
+      <a href="#precios" data-v="precios">Precios</a>
+    </nav>
+  </div>
+</header>
+
+<main><div class="wrap">
+  <div class="status" id="status">Conectando con los datos del hogar…</div>
+
+  <!-- INGRESO -->
+  <section id="login" class="login" hidden>
+    <div class="panel login-card">
+      <svg viewBox="0 0 512 512" class="login-mark" aria-hidden="true"><path d="M110 250 256 128l146 122v148a14 14 0 0 1-14 14H124a14 14 0 0 1-14-14z" fill="var(--accent)"/><circle cx="215" cy="318" r="46" fill="var(--pb)" opacity=".75"/><circle cx="297" cy="318" r="46" fill="var(--accent-soft)"/></svg>
+      <h2>Bienvenidos a casa</h2>
+      <p class="sub">Entra con la cuenta que creaste para ti en Supabase. El celular recordará la sesión.</p>
+      <form id="loginForm" class="login-form">
+        <label>Correo<input type="email" id="lEmail" autocomplete="username" required></label>
+        <label>Contraseña<input type="password" id="lPass" autocomplete="current-password" required></label>
+        <button class="btn primary" id="lBtn">Entrar</button>
+        <p class="login-err" id="lErr" role="alert"></p>
+      </form>
+    </div>
+  </section>
+
+  <!-- INICIO -->
+  <section class="view" id="v-inicio" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2 id="hello">Hola</h2><span class="sub" id="todayLabel"></span></div>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Para hoy</h2><span class="sub">Aseo que toca y pendientes que vencen</span></div>
+      <div class="panel"><ul class="list" id="todayList"></ul></div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Ajustes del hogar</h2><span class="sub">Los ven y editan los dos</span></div>
+      <div class="panel settings">
+        <div class="row2">
+          <label>Persona 1<input type="text" id="nameA" maxlength="24" placeholder="Tu nombre"></label>
+          <label>Persona 2<input type="text" id="nameB" maxlength="24" placeholder="Nombre de tu pareja"></label>
+          <label>Moneda<input type="text" id="currency" maxlength="4" placeholder="$"></label>
+        </div>
+        <div style="display:grid;gap:6px">
+          <span class="eyebrow">Supermercados</span>
+          <div class="storechips" id="storeChips1"></div>
+          <form class="form" style="padding:0" data-form="store"><input type="text" class="grow" id="storeIn1" name="store" placeholder="Agregar supermercado (ej. Lider, Éxito, Mercadona…)" maxlength="30"><button class="btn">Agregar</button></form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PENDIENTES -->
+  <section class="view" id="v-pendientes" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Pendientes</h2><div class="seg" id="pendFilter" role="group" aria-label="Filtrar"></div></div>
+      <div class="panel">
+        <form class="form" data-form="tarea">
+          <input type="text" class="grow" id="tTitle" name="title" placeholder="¿Qué hay que hacer? (ej. Pagar la luz)" maxlength="120" required>
+          <select id="tOwner" name="owner" aria-label="Para quién"></select>
+          <input type="date" id="tDue" name="due" aria-label="Fecha límite">
+          <button class="btn primary">Agregar</button>
+        </form>
+        <ul class="list" id="pendList" style="border-top:1px solid var(--line)"></ul>
+        <details class="more" id="pendDoneWrap"><summary><span id="pendDoneLabel">Completados</span><button type="button" class="btn small ghost" data-action="clearDone" data-confirm>Borrar completados</button></summary><ul class="list" id="pendDone"></ul></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ASEO -->
+  <section class="view" id="v-aseo" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Aseo</h2><span class="sub">Rutinas que se repiten cada cierto tiempo</span></div>
+      <div class="panel">
+        <form class="form" data-form="aseo">
+          <input type="text" class="grow" id="aName" name="name" placeholder="Tarea (ej. Limpiar el baño)" maxlength="60" required>
+          <label class="sub" style="display:flex;align-items:center;gap:6px">cada <input type="number" id="aFreq" name="freq" min="1" max="365" value="7" style="width:70px"> días</label>
+          <select id="aWho" name="who" aria-label="Responsable"></select>
+          <button class="btn primary">Agregar</button>
+        </form>
+        <ul class="list" id="aseoList" style="border-top:1px solid var(--line)"></ul>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Reparto</h2><span class="sub">Tareas de aseo hechas en los últimos 30 días</span></div>
+      <div class="panel balance" id="balance"></div>
+    </div>
+  </section>
+
+  <!-- COMPRAS -->
+  <section class="view" id="v-compras" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>Lista de compras</h2><span class="sub" id="compSub"></span></div>
+      <div class="panel">
+        <form class="form" data-form="compra">
+          <input type="text" class="grow" id="cName" name="name" list="productNames" placeholder="Producto (ej. Leche)" maxlength="60" required>
+          <input type="text" id="cQty" name="qty" placeholder="Cantidad" maxlength="20" style="width:120px">
+          <button class="btn primary">Agregar</button>
+        </form>
+        <datalist id="productNames"></datalist>
+        <ul class="list" id="compList" style="border-top:1px solid var(--line)"></ul>
+        <details class="more" id="compDoneWrap" open><summary><span id="compDoneLabel">En el carro</span><button type="button" class="btn small ghost" data-action="clearCart" data-confirm>Quitar comprados</button></summary><ul class="list" id="compDone"></ul></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRECIOS -->
+  <section class="view" id="v-precios" hidden>
+    <div class="sec">
+      <div class="sec-h"><h2>¿Dónde sale más barata tu lista?</h2><span class="sub">Según los precios que han anotado</span></div>
+      <div class="panel basket" id="basket"></div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Comparador de precios</h2><span class="sub">Anota el precio que vieron en cada súper</span></div>
+      <div class="panel" style="display:grid">
+        <div style="padding:12px;display:grid;gap:8px;border-bottom:1px solid var(--line)">
+          <div class="storechips" id="storeChips2"></div>
+          <form class="form" style="padding:0" data-form="store"><input type="text" class="grow" id="storeIn2" name="store" placeholder="Agregar supermercado" maxlength="30"><button class="btn">Agregar súper</button></form>
+        </div>
+        <form class="form" data-form="producto" style="border-bottom:1px solid var(--line)">
+          <input type="text" class="grow" id="pName" name="name" placeholder="Producto (ej. Arroz)" maxlength="60" required>
+          <input type="text" id="pUnit" name="unit" placeholder="Formato (ej. 1 kg)" maxlength="20" style="width:140px">
+          <button class="btn primary">Agregar producto</button>
+        </form>
+        <div class="tablewrap" id="priceTable"></div>
+      </div>
+    </div>
+  </section>
+</div></main>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+"use strict";
+const COLS=['tareas','aseo','compras','precios'];
+const S={config:{names:{a:'',b:''},stores:[],currency:'$'},tareas:[],aseo:[],compras:[],precios:[]};
+let sb=null, session=null, channel=null;
+const $=id=>document.getElementById(id);
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+let me=lsGet('casa.me')==='b'?'b':'a';
+let pendFilter=lsGet('casa.pf')||'todos';
+
+/* ---------- utilidades ---------- */
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const fmtD=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseD=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const today=()=>fmtD(new Date());
+const addDays=(s,n)=>{const d=parseD(s);d.setDate(d.getDate()+n);return fmtD(d)};
+const diffDays=(a,b)=>Math.round((parseD(b)-parseD(a))/864e5);
+const shortDate=s=>parseD(s).toLocaleDateString('es',{day:'numeric',month:'short'});
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+const newId=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+const nf=new Intl.NumberFormat('es',{maximumFractionDigits:2});
+const money=n=>(S.config.currency||'$')+' '+nf.format(n);
+const nameOf=k=>k==='ambos'?'Juntos':(S.config.names[k]||(k==='a'?'Persona 1':'Persona 2'));
+const other=k=>k==='a'?'b':'a';
+const whoPill=k=>`<span class="who who-${k}">${esc(nameOf(k))}</span>`;
+
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,3200)}
+function errMsg(e){
+  const c=e&&e.code;
+  if(c==='invalid_argument') return 'No se pudo guardar: tu acceso a esta página es solo de lectura.';
+  if(c==='quota_exceeded') return 'Se llenó el espacio de datos. Borra elementos antiguos e inténtalo otra vez.';
+  if(c==='resource_exhausted') return 'Demasiados cambios seguidos. Espera unos segundos.';
+  return 'No se pudo guardar. Revisa tu conexión e inténtalo otra vez.';
+}
+
+/* ---------- almacenamiento en Supabase ----------
+   Una sola tabla "items": (col, id) -> data jsonb.  col = tareas | aseo | compras | precios | hogar */
+function cleanConfig(c){ c=c||{}; return {names:{a:(c.names&&c.names.a)||'',b:(c.names&&c.names.b)||''},members:{a:(c.members&&c.members.a)||null,b:(c.members&&c.members.b)||null},stores:Array.isArray(c.stores)?c.stores:[],currency:c.currency||'$'} }
+const strip=o=>{const {id,...r}=o;return r};
+function applyRow(col,id,data){
+  if(col==='hogar'){ if(id==='config'){ S.config=cleanConfig(data) } return }
+  if(!S[col]) return;
+  const arr=S[col], i=arr.findIndex(x=>x.id===id), row={id,...data};
+  if(i>=0) arr[i]=row; else arr.push(row);
+}
+function removeRow(col,id){ if(S[col]) S[col]=S[col].filter(x=>x.id!==id) }
+function cacheSave(){ lsSet('hogar.cache',JSON.stringify(S)) }
+function cacheLoad(){ try{const d=JSON.parse(lsGet('hogar.cache')||'null'); if(d){Object.assign(S,d); S.config=cleanConfig(S.config)}}catch(e){} }
+let renderQueued=false;
+function scheduleRender(){ if(renderQueued) return; renderQueued=true; requestAnimationFrame(()=>{renderQueued=false; render(); cacheSave()}) }
+function writeErr(e){ console.error(e); toast(navigator.onLine?'No se pudo guardar. Inténtalo otra vez.':'Sin internet: el cambio no se guardó.') }
+
+async function put(col,id,data){
+  id=id||newId();
+  applyRow(col,id,data); scheduleRender();
+  const {error}=await sb.from('items').upsert({col,id,data,updated_at:new Date().toISOString()});
+  if(error){ writeErr(error); refetch() }
+  return id;
+}
+async function patch(col,id,fields){ const cur=S[col].find(x=>x.id===id); if(!cur) return; await put(col,id,{...strip(cur),...fields}) }
+async function del(col,id){
+  removeRow(col,id); scheduleRender();
+  const {error}=await sb.from('items').delete().match({col,id});
+  if(error){ writeErr(error); refetch() }
+}
+async function saveConfig(fields){ await put('hogar','config',cleanConfig({...S.config,...fields})) }
+
+async function refetch(){
+  const {data,error}=await sb.from('items').select('col,id,data').limit(5000);
+  if(error){ $('status').textContent='No se pudieron cargar los datos. Revisa tu conexión.'; return }
+  for(const c of COLS) S[c]=[];
+  S.config=cleanConfig({});
+  for(const r of data) applyRow(r.col,r.id,r.data);
+  $('status').textContent='';
+  autoMe(); scheduleRender();
+}
+function listen(){
+  if(channel) sb.removeChannel(channel);
+  channel=sb.channel('hogar-items')
+    .on('postgres_changes',{event:'*',schema:'public',table:'items'},pl=>{
+      if(pl.eventType==='DELETE'){ const o=pl.old||{}; removeRow(o.col,o.id) }
+      else { const n=pl.new; applyRow(n.col,n.id,n.data) }
+      scheduleRender();
+    })
+    .subscribe();
+}
+/* Cada cuenta queda ligada a "Persona 1" o "Persona 2" */
+function autoMe(){
+  const uid=session&&session.user.id, m=S.config.members;
+  if(uid&&m.a===uid) me='a'; else if(uid&&m.b===uid) me='b';
+  lsSet('casa.me',me);
+}
+async function claimMe(k){
+  me=k; lsSet('casa.me',me);
+  const uid=session.user.id, m={...S.config.members};
+  if(m[k]!==uid){
+    if(m[other(k)]===uid) m[other(k)]=null;
+    m[k]=uid; await saveConfig({members:m});
+  }
+  render();
+}
+
+/* ---------- datos derivados ---------- */
+function choreState(c){
+  const t=today();
+  if(!c.lastDone) return {due:t,days:0,label:'Nunca hecha',cls:'today'};
+  const due=addDays(c.lastDone,Number(c.freq)||7), d=diffDays(t,due);
+  if(d<0) return {due,days:d,label:`Atrasada ${-d} d`,cls:'late'};
+  if(d===0) return {due,days:0,label:'Toca hoy',cls:'today'};
+  return {due,days:d,label:d===1?'Mañana':`En ${d} días`,cls:'ok'};
+}
+function choreWho(c){ return c.who==='alterna' ? (c.turn||'a') : (c.who||'ambos') }
+function dueChip(due){
+  if(!due) return '';
+  const d=diffDays(today(),due);
+  if(d<0) return `<span class="chip late">Venció hace ${-d} d</span>`;
+  if(d===0) return `<span class="chip today">Vence hoy</span>`;
+  if(d===1) return `<span class="chip">Mañana</span>`;
+  return `<span class="chip">${esc(shortDate(due))}</span>`;
+}
+function priceIndex(){ const m=new Map(); for(const p of S.precios) m.set(norm(p.name),p); return m }
+function bestPrice(p){
+  let best=null; for(const s of S.config.stores){ const v=p.prices&&p.prices[s]; if(typeof v==='number'&&v>0&&(!best||v<best.v)) best={s,v} }
+  return best;
+}
+
+/* ---------- render ---------- */
+function render(){
+  renderChrome(); renderInicio(); renderPend(); renderAseo(); renderCompras(); renderPrecios();
+}
+function renderChrome(){
+  $('meSeg').innerHTML=['a','b'].map(k=>`<button type="button" data-action="me" data-k="${k}" aria-pressed="${me===k}">${esc(nameOf(k))}</button>`).join('');
+  const opts=k=>`<option value="${k}">${esc(k==='ambos'?'Juntos':k===me?nameOf(k)+' (yo)':nameOf(k))}</option>`;
+  fillSelect('tOwner',[me,other(me),'ambos'].map(opts).join(''));
+  fillSelect('aWho',[opts('a'),opts('b'),'<option value="alterna">Por turnos</option>',opts('ambos')].join(''));
+  const openPend=S.tareas.filter(t=>!t.done&&(t.owner===me||t.owner==='ambos')).length;
+  const lateChores=S.aseo.filter(c=>choreState(c).days<=0).length;
+  const toBuy=S.compras.filter(c=>!c.checked).length;
+  setBadge('b-pend',openPend,false); setBadge('b-aseo',lateChores,lateChores>0); setBadge('b-comp',toBuy,false);
+  for(const [i,id] of [['nameA','a'],['nameB','b']]) if(document.activeElement!==$(i)) $(i).value=S.config.names[id]||'';
+  if(document.activeElement!==$('currency')) $('currency').value=S.config.currency;
+  const chips=S.config.stores.map(s=>`<span class="storechip">${esc(s)}<button type="button" class="x" data-action="rmStore" data-s="${esc(s)}" data-confirm aria-label="Quitar ${esc(s)}">×</button></span>`).join('')||'<span class="sub">Aún no hay supermercados.</span>';
+  $('storeChips1').innerHTML=chips; $('storeChips2').innerHTML=chips;
+  $('productNames').innerHTML=S.precios.map(p=>`<option value="${esc(p.name)}"></option>`).join('');
+}
+function fillSelect(id,html){const el=$(id); const v=el.value; if(el.innerHTML!==html){el.innerHTML=html; if(v&&[...el.options].some(o=>o.value===v)) el.value=v}}
+function setBadge(id,n,hot){const b=$(id); b.textContent=n||''; b.hidden=!n; b.classList.toggle('hot',hot)}
+
+function renderInicio(){
+  const n=S.config.names[me];
+  $('hello').textContent=n?`Hola, ${n}`:'Hola';
+  $('todayLabel').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
+  const mine=S.tareas.filter(t=>!t.done&&t.owner===me).length;
+  const both=S.tareas.filter(t=>!t.done&&t.owner==='ambos').length;
+  const late=S.aseo.filter(c=>choreState(c).days<0).length;
+  const dueToday=S.aseo.filter(c=>choreState(c).days<=0).length;
+  const buy=S.compras.filter(c=>!c.checked).length;
+  $('stats').innerHTML=`
+    <a class="stat" href="#pendientes"><b>${mine}</b><span>Pendientes tuyos</span></a>
+    <a class="stat" href="#pendientes"><b>${both}</b><span>Pendientes juntos</span></a>
+    <a class="stat ${late?'alert':''}" href="#aseo"><b>${dueToday}</b><span>Aseo para hoy${late?` · ${late} atrasado${late>1?'s':''}`:''}</span></a>
+    <a class="stat" href="#compras"><b>${buy}</b><span>Por comprar</span></a>`;
+  const t=today();
+  const chores=S.aseo.map(c=>({c,s:choreState(c)})).filter(x=>x.s.days<=0).sort((x,y)=>x.s.days-y.s.days);
+  const tasks=S.tareas.filter(x=>!x.done&&x.due&&x.due<=t).sort((a,b)=>a.due.localeCompare(b.due));
+  if(!chores.length&&!tasks.length){
+    $('todayList').innerHTML=`<li class="empty"><strong>Nada urgente hoy</strong><span>Cuando una tarea de aseo toque o un pendiente venza, aparecerá aquí.</span></li>`;
+    return;
+  }
+  $('todayList').innerHTML=chores.map(({c,s})=>`
+    <li><div class="li-main"><span class="li-title">${esc(c.name)}</span>
+      <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${whoPill(choreWho(c))}<span>Aseo</span></span></div>
+      <button class="btn small" data-action="choreDone" data-id="${c.id}">Hecho</button></li>`).join('')+
+    tasks.map(x=>`
+    <li><input type="checkbox" class="check" data-action="toggleTask" data-id="${x.id}" aria-label="Completar ${esc(x.title)}">
+      <div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta">${dueChip(x.due)}${whoPill(x.owner)}</span></div></li>`).join('');
+}
+
+function taskRow(x){
+  return `<li class="${x.done?'done':''}"><input type="checkbox" class="check" data-action="toggleTask" data-id="${x.id}" ${x.done?'checked':''} aria-label="Completar ${esc(x.title)}">
+    <div class="li-main"><span class="li-title">${esc(x.title)}</span>
+    <span class="li-meta">${whoPill(x.owner)}${x.done?'':dueChip(x.due)}${x.by&&x.owner!==x.by?`<span>Lo anotó ${esc(nameOf(x.by))}</span>`:''}</span></div>
+    <button class="x" data-action="delTask" data-id="${x.id}" data-confirm aria-label="Borrar">×</button></li>`;
+}
+function renderPend(){
+  const f=[['todos','Todos'],['mios','Míos'],['otro',nameOf(other(me))],['ambos','Juntos']];
+  $('pendFilter').innerHTML=f.map(([k,l])=>`<button type="button" data-action="pf" data-k="${k}" aria-pressed="${pendFilter===k}">${esc(l)}</button>`).join('');
+  const pass=x=>pendFilter==='todos'||(pendFilter==='mios'&&x.owner===me)||(pendFilter==='otro'&&x.owner===other(me))||(pendFilter==='ambos'&&x.owner==='ambos');
+  const open=S.tareas.filter(x=>!x.done&&pass(x)).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||(a.created||0)-(b.created||0));
+  const done=S.tareas.filter(x=>x.done&&pass(x)).sort((a,b)=>(b.doneAt||0)-(a.doneAt||0));
+  $('pendList').innerHTML=open.length?open.map(taskRow).join(''):`<li class="empty"><strong>${S.tareas.length?'Todo al día':'Sin pendientes todavía'}</strong><span>${S.tareas.length?'No hay pendientes abiertos en este filtro.':'Escribe arriba algo que haya que hacer y elige si es tuyo, de tu pareja o de los dos.'}</span></li>`;
+  $('pendDone').innerHTML=done.map(taskRow).join('');
+  $('pendDoneLabel').textContent=`Completados (${done.length})`;
+  $('pendDoneWrap').hidden=!done.length;
+}
+
+const SUGERIDAS=[['Lavar los platos',1,'alterna'],['Sacar la basura',2,'alterna'],['Regar las plantas',3,'a'],['Barrer y trapear',7,'alterna'],['Limpiar el baño',7,'alterna'],['Lavar la ropa',7,'ambos'],['Cambiar las sábanas',14,'ambos'],['Limpiar el refrigerador',30,'ambos']];
+function renderAseo(){
+  const rows=S.aseo.map(c=>({c,s:choreState(c)})).sort((x,y)=>x.s.days-y.s.days||norm(x.c.name).localeCompare(norm(y.c.name)));
+  $('aseoList').innerHTML=rows.length?rows.map(({c,s})=>`
+    <li><div class="li-main"><span class="li-title">${esc(c.name)}</span>
+      <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${c.who==='alterna'?`<span>Turno de</span>`:''}${whoPill(choreWho(c))}<span>cada ${Number(c.freq)||7} d</span>${c.lastDone?`<span>· última ${esc(shortDate(c.lastDone))}${c.lastBy?' por '+esc(nameOf(c.lastBy)):''}</span>`:''}</span></div>
+      <button class="btn small ${s.days<=0?'primary':''}" data-action="choreDone" data-id="${c.id}">Hecho</button>
+      <button class="x" data-action="delChore" data-id="${c.id}" data-confirm aria-label="Borrar">×</button></li>`).join('')
+    :`<li class="empty"><strong>Aún no hay rutinas de aseo</strong><span>Agrega la primera arriba, o empieza con una lista típica y ajústala.</span><button class="btn" data-action="seedAseo">Cargar rutina sugerida</button></li>`;
+  const since=addDays(today(),-30); const cnt={a:0,b:0};
+  for(const c of S.aseo) for(const h of (c.history||[])) if(h.d>=since&&cnt[h.by]!==undefined) cnt[h.by]++;
+  const tot=cnt.a+cnt.b;
+  $('balance').innerHTML=tot?`
+    <div class="bar"><i class="a" style="width:${cnt.a/tot*100}%"></i><i class="b" style="width:${cnt.b/tot*100}%"></i></div>
+    <div class="balance-legend"><span>${whoPill('a')} ${cnt.a} (${Math.round(cnt.a/tot*100)}%)</span><span>${whoPill('b')} ${cnt.b} (${Math.round(cnt.b/tot*100)}%)</span></div>`
+    :`<span class="sub">Cuando marquen tareas como hechas, aquí verán cómo se reparte el aseo entre los dos.</span>`;
+}
+
+function renderCompras(){
+  const idx=priceIndex();
+  const row=x=>{
+    const p=idx.get(norm(x.name)); const b=p&&bestPrice(p);
+    return `<li class="${x.checked?'done':''}"><input type="checkbox" class="check" data-action="toggleBuy" data-id="${x.id}" ${x.checked?'checked':''} aria-label="Marcar ${esc(x.name)}">
+      <div class="li-main"><span class="li-title">${esc(x.name)}${x.qty?` <span class="sub">· ${esc(x.qty)}</span>`:''}</span>
+      <span class="li-meta">${b&&!x.checked?`<span class="hint">Más barato en ${esc(b.s)} · ${money(b.v)}</span>`:''}${x.by?`<span>Lo anotó ${esc(nameOf(x.by))}</span>`:''}</span></div>
+      <button class="x" data-action="delBuy" data-id="${x.id}" aria-label="Borrar">×</button></li>`;
+  };
+  const open=S.compras.filter(x=>!x.checked).sort((a,b)=>(a.created||0)-(b.created||0));
+  const done=S.compras.filter(x=>x.checked);
+  $('compSub').textContent=open.length?`${open.length} por comprar`:'';
+  $('compList').innerHTML=open.length?open.map(row).join(''):`<li class="empty"><strong>${done.length?'Ya está todo en el carro':'La lista está vacía'}</strong><span>Agrega lo que falta en casa. Si el producto está en el comparador, verás dónde sale más barato.</span></li>`;
+  $('compDone').innerHTML=done.map(row).join('');
+  $('compDoneLabel').textContent=`En el carro (${done.length})`;
+  $('compDoneWrap').hidden=!done.length;
+}
+
+let tableDirty=false;
+function renderPrecios(){
+  const stores=S.config.stores;
+  // cesta
+  const idx=priceIndex();
+  const items=S.compras.filter(x=>!x.checked).map(x=>idx.get(norm(x.name))).filter(Boolean);
+  if(!stores.length){
+    $('basket').innerHTML=`<div class="empty"><strong>Agrega tus supermercados</strong><span>Escribe abajo los súper donde suelen comprar para comparar precios.</span></div>`;
+  }else if(!items.length){
+    $('basket').innerHTML=`<span class="sub">Cuando un producto de la lista de compras también esté en el comparador, aquí verán cuánto costaría la lista en cada supermercado.</span>`;
+  }else{
+    const tot=stores.map(s=>{let sum=0,miss=0;for(const p of items){const v=p.prices&&p.prices[s];if(typeof v==='number'&&v>0)sum+=v;else miss++}return {s,sum,miss}});
+    const full=tot.filter(t=>!t.miss); const max=Math.max(...tot.map(t=>t.sum),1);
+    const win=full.length?full.reduce((a,b)=>a.sum<=b.sum?a:b):null;
+    let mix=0,mixMiss=0;for(const p of items){const b=bestPrice(p);if(b)mix+=b.v;else mixMiss++}
+    $('basket').innerHTML=tot.map(t=>`<div class="brow ${win&&win.s===t.s?'win':''}"><span>${esc(t.s)}</span><div class="bar"><i style="width:${t.sum/max*100}%"></i></div><span><b>${money(t.sum)}</b>${t.miss?` <small>faltan ${t.miss}</small>`:''}</span></div>`).join('')+
+      `<div class="sub" style="margin-top:4px">${items.length} producto${items.length>1?'s':''} de tu lista con precio. ${win?`Lo más barato en un solo lugar: <b style="color:var(--ok)">${esc(win.s)}</b>. `:''}Comprando cada cosa donde está más barata: <b>${money(mix)}</b>${mixMiss?` (sin precio: ${mixMiss})`:''}.</div>`;
+  }
+  // tabla
+  if($('priceTable').contains(document.activeElement)){tableDirty=true;return}
+  tableDirty=false;
+  if(!S.precios.length){
+    $('priceTable').innerHTML=`<div class="empty"><strong>Sin productos aún</strong><span>Agrega productos que compran seguido (arroz, leche, detergente…) y anota el precio en cada súper.</span></div>`;
+    return;
+  }
+  const rows=[...S.precios].sort((a,b)=>norm(a.name).localeCompare(norm(b.name)));
+  $('priceTable').innerHTML=`<table><thead><tr><th>Producto</th>${stores.map(s=>`<th>${esc(s)}</th>`).join('')}<th>Ahorro</th><th></th></tr></thead><tbody>${rows.map(p=>{
+    const vals=stores.map(s=>p.prices&&p.prices[s]).filter(v=>typeof v==='number'&&v>0);
+    const min=vals.length?Math.min(...vals):null, max=vals.length?Math.max(...vals):null;
+    return `<tr><td><b>${esc(p.name)}</b>${p.unit?`<span class="unit">${esc(p.unit)}</span>`:''}</td>${stores.map(s=>{const v=p.prices&&p.prices[s];const has=typeof v==='number'&&v>0;
+      return `<td class="${has&&vals.length>1&&v===min?'best':''}"><input type="number" inputmode="decimal" min="0" step="any" id="pr-${p.id}-${stores.indexOf(s)}" data-action="price" data-id="${p.id}" data-s="${esc(s)}" value="${has?v:''}" placeholder="—" aria-label="Precio de ${esc(p.name)} en ${esc(s)}"></td>`}).join('')}
+      <td>${vals.length>1&&max>min?`<span class="save">${money(max-min)}</span><span class="unit">${Math.round((max-min)/max*100)}%</span>`:'<span class="sub">—</span>'}</td>
+      <td><button class="x" data-action="delProd" data-id="${p.id}" data-confirm aria-label="Borrar ${esc(p.name)}">×</button></td></tr>`}).join('')}</tbody></table>`;
+}
+$('priceTable').addEventListener('focusout',()=>setTimeout(()=>{if(tableDirty&&!$('priceTable').contains(document.activeElement))renderPrecios()},0));
+
+/* ---------- vistas ---------- */
+const VIEWS=['inicio','pendientes','aseo','compras','precios'];
+function showView(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'inicio';
+  for(const k of VIEWS) $('v-'+k).hidden=k!==v;
+  document.querySelectorAll('#nav a').forEach(a=>{if(a.dataset.v===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+}
+
+/* ---------- acciones ---------- */
+function armed(btn){
+  if(!btn.hasAttribute('data-confirm')) return true;
+  if(btn.classList.contains('armed')){btn.classList.remove('armed');return true}
+  btn.dataset.orig=btn.innerHTML; btn.classList.add('armed'); btn.textContent='¿Seguro?';
+  setTimeout(()=>{if(btn.isConnected&&btn.classList.contains('armed')){btn.classList.remove('armed');btn.innerHTML=btn.dataset.orig}},3000);
+  return false;
+}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-action]'); if(!b||b.matches('input')) return;
+  const a=b.dataset.action, id=b.dataset.id;
+  if(b.tagName==='BUTTON') e.preventDefault();
+  if(!armed(b)) return;
+  switch(a){
+    case 'me': claimMe(b.dataset.k); break;
+    case 'logout': await sb.auth.signOut(); break;
+    case 'pf': pendFilter=b.dataset.k; lsSet('casa.pf',pendFilter); renderPend(); break;
+    case 'delTask': del('tareas',id); break;
+    case 'clearDone': for(const x of S.tareas.filter(x=>x.done)) await del('tareas',x.id); toast('Completados borrados'); break;
+    case 'choreDone': {
+      const c=S.aseo.find(x=>x.id===id); if(!c) break;
+      const hist=[...(c.history||[]),{d:today(),by:me}].slice(-40);
+      await patch('aseo',id,{lastDone:today(),lastBy:me,history:hist,turn:c.who==='alterna'?other(choreWho(c)):(c.turn||'a')});
+      toast(`“${c.name}” marcada como hecha`); break;
+    }
+    case 'delChore': del('aseo',id); break;
+    case 'seedAseo': for(const [name,freq,who] of SUGERIDAS) await put('aseo',null,{name,freq,who,turn:'a',lastDone:null,history:[],created:Date.now()}); toast('Rutina cargada. Ajusta o borra lo que no uses.'); break;
+    case 'delBuy': del('compras',id); break;
+    case 'clearCart': for(const x of S.compras.filter(x=>x.checked)) await del('compras',x.id); toast('Lista limpia'); break;
+    case 'delProd': del('precios',id); break;
+    case 'rmStore': saveConfig({stores:S.config.stores.filter(s=>s!==b.dataset.s)}); break;
+  }
+});
+document.addEventListener('change',e=>{
+  const el=e.target, a=el.dataset.action, id=el.dataset.id;
+  if(a==='toggleTask'){ patch('tareas',id,{done:el.checked,doneAt:el.checked?Date.now():null}) }
+  else if(a==='toggleBuy'){ patch('compras',id,{checked:el.checked}) }
+  else if(a==='price'){
+    const p=S.precios.find(x=>x.id===id); if(!p) return;
+    const v=parseFloat(String(el.value).replace(',','.'));
+    const prices={...(p.prices||{})}; if(isFinite(v)&&v>0) prices[el.dataset.s]=v; else delete prices[el.dataset.s];
+    patch('precios',id,{prices,updated:today()});
+  }
+  else if(el.id==='nameA'||el.id==='nameB'){ saveConfig({names:{...S.config.names,[el.id==='nameA'?'a':'b']:el.value.trim()}}) }
+  else if(el.id==='currency'){ saveConfig({currency:el.value.trim()||'$'}) }
+});
+document.addEventListener('submit',async e=>{
+  const f=e.target, kind=f.dataset.form; if(!kind) return; e.preventDefault(); const fd=new FormData(f);
+  const val=k=>String(fd.get(k)||'').trim();
+  if(kind==='tarea'){ if(!val('title'))return; await put('tareas',null,{title:val('title'),owner:val('owner')||me,due:val('due')||null,done:false,by:me,created:Date.now()}); $('tTitle').value=''; $('tDue').value=''; $('tTitle').focus() }
+  else if(kind==='aseo'){ if(!val('name'))return; const freq=Math.max(1,Math.min(365,parseInt(val('freq'))||7)); await put('aseo',null,{name:val('name'),freq,who:val('who')||'alterna',turn:'a',lastDone:null,history:[],created:Date.now()}); $('aName').value=''; $('aName').focus() }
+  else if(kind==='compra'){ if(!val('name'))return; await put('compras',null,{name:val('name'),qty:val('qty'),checked:false,by:me,created:Date.now()}); $('cName').value=''; $('cQty').value=''; $('cName').focus() }
+  else if(kind==='producto'){ const n=val('name'); if(!n)return; if(priceIndex().has(norm(n))){toast('Ese producto ya está en el comparador');return} await put('precios',null,{name:n,unit:val('unit'),prices:{},created:Date.now()}); $('pName').value=''; $('pUnit').value=''; $('pName').focus() }
+  else if(kind==='store'){ const s=val('store'); if(!s)return; if(S.config.stores.some(x=>norm(x)===norm(s))){toast('Ese supermercado ya está');return} await saveConfig({stores:[...S.config.stores,s]}); f.reset() }
+});
+
+/* ---------- arranque ---------- */
+function showApp(on){
+  $('login').hidden=on; $('nav').hidden=!on; $('whoami').hidden=!on;
+  if(on) showView(); else for(const k of VIEWS) $('v-'+k).hidden=true;
+}
+$('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault(); e.stopPropagation();
+  $('lErr').textContent=''; $('lBtn').disabled=true; $('lBtn').textContent='Entrando…';
+  const {error}=await sb.auth.signInWithPassword({email:$('lEmail').value.trim(),password:$('lPass').value});
+  $('lBtn').disabled=false; $('lBtn').textContent='Entrar';
+  if(error) $('lErr').textContent=/invalid/i.test(error.message)?'Correo o contraseña incorrectos.':'No se pudo entrar. Revisa tu conexión e inténtalo otra vez.';
+});
+function onSession(s){
+  const was=session&&session.user.id; session=s;
+  if(!s){
+    if(channel){sb.removeChannel(channel);channel=null}
+    try{localStorage.removeItem('hogar.cache')}catch(e){}
+    $('status').textContent=''; showApp(false); return;
+  }
+  if(was===s.user.id) return;
+  showApp(true); cacheLoad(); render();
+  $('status').textContent='Cargando…';
+  refetch(); listen();
+}
+const cfg=window.HOGAR_CONFIG||{};
+if(!window.supabase||!cfg.supabaseUrl||/TU-PROYECTO/.test(cfg.supabaseUrl)){
+  $('status').textContent='Falta configurar Supabase: pega la URL y la anon key de tu proyecto en el archivo config.js.';
+}else{
+  sb=window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}});
+  $('status').textContent='';
+  sb.auth.getSession().then(({data})=>{ onSession(data.session); if(!data.session) showApp(false) });
+  sb.auth.onAuthStateChange((_ev,s)=>onSession(s));
+  // al volver a la app (el celular suspende la conexión), traer lo último
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&session){ refetch(); listen() } });
+  window.addEventListener('online',()=>{ if(session){ refetch(); listen() } });
+}
+window.addEventListener('hashchange',()=>{ if(session) showView() });
+})();
+</script>
+</body>
+</html>
