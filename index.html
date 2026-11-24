@@ -20,7 +20,7 @@
 :root{
   --bg:#FBF5FA; --surface:#FFFFFF; --surface-2:#F4E9F5; --ink:#2F2236; --muted:#7A6684; --line:#ECDDEF;
   --accent:#8C5FD0; --accent-ink:#FFFFFF; --accent-soft:#EEE4FB;
-  --pa:#7A55C4; --pa-soft:#ECE3FA; --pb:#CC4F87; --pb-soft:#FCE2EE; --both:#B0628F; --both-soft:#F8E4F0;
+  --pa:#7A55C4; --pa-soft:#ECE3FA; --pb:#CC4F87; --pb-soft:#FCE2EE; --both:#BF6A2E; --both-soft:#FCE9DA;
   --warn:#C23F5C; --warn-soft:#FDE1E7; --ok:#3A8F68; --ok-soft:#DDF2E6;
   --f-display:"Fredoka", "Avenir Next", system-ui, sans-serif;
   --f-body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -30,7 +30,7 @@
 @media (prefers-color-scheme: dark){:root{
   --bg:#1B1421; --surface:#241B2B; --surface-2:#2F2437; --ink:#F3E9F6; --muted:#B9A5C2; --line:#3B2E45;
   --accent:#C6A2F4; --accent-ink:#1B1421; --accent-soft:#36284A;
-  --pa:#BB9EF0; --pa-soft:#33284A; --pb:#F59CC4; --pb-soft:#46253A; --both:#E7A9CC; --both-soft:#3F2638;
+  --pa:#BB9EF0; --pa-soft:#33284A; --pb:#F59CC4; --pb-soft:#46253A; --both:#F2B784; --both-soft:#40291A;
   --warn:#F48FA3; --warn-soft:#46222C; --ok:#7FD3A6; --ok-soft:#1E3A2C; color-scheme:dark;}}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -159,6 +159,46 @@ td.best input{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);f
 
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
 .hint{color:var(--ok);font-weight:600}
+.alertbar{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:var(--r);background:var(--pb-soft);color:var(--ink);text-decoration:none;font-size:14px;border:1px solid color-mix(in srgb,var(--pb) 30%,transparent)}
+.alertbar b{color:var(--pb)}
+.alertbar .bell{flex:none;width:20px;height:20px;margin-top:1px;color:var(--pb)}
+.cal{padding:10px 10px 12px;display:grid;gap:6px}
+.cal-head{display:flex;align-items:center;gap:4px}
+.cal-head h3{flex:1;text-align:center;font-size:18px;font-weight:600}
+.cal-head h3::first-letter{text-transform:uppercase}
+.cal-head .ghost{font-size:22px;width:40px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.cal-dow span{text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:2px 0}
+.cal-day{min-height:86px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:4px 4px 5px;display:flex;flex-direction:column;gap:3px;cursor:pointer;text-align:left;min-width:0;font:inherit;color:inherit}
+.cal-day:hover{border-color:var(--accent)}
+.cal-day.out{opacity:.4}
+.cal-day.today{background:var(--accent-soft);border-color:var(--accent)}
+.cal-day.sel{box-shadow:0 0 0 2px var(--accent)}
+.cal-num{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--muted)}
+.cal-day.today .cal-num{color:var(--accent)}
+.cal-ev{display:block;font-size:11px;line-height:1.25;padding:1px 5px;border-radius:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.cal-ev.a{background:var(--pa-soft);color:var(--pa)} .cal-ev.b{background:var(--pb-soft);color:var(--pb)} .cal-ev.ambos{background:var(--both-soft);color:var(--both)}
+.cal-ev.late{background:var(--warn);color:#fff}
+.cal-ev.done{background:transparent;color:var(--muted);text-decoration:line-through;font-weight:500}
+.cal-more{font-size:10.5px;color:var(--muted);font-weight:700;padding-left:4px}
+.cal-dots{display:none;gap:3px;flex-wrap:wrap;justify-content:center}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.dot.a{background:var(--pa)} .dot.b{background:var(--pb)} .dot.ambos{background:var(--both)} .dot.late{background:var(--warn);box-shadow:0 0 0 1.5px var(--surface),0 0 0 3px var(--warn);margin:0 2px} .dot.done{background:var(--line);box-shadow:inset 0 0 0 1.5px var(--muted)}
+.cal-legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--muted);padding:4px 4px 0}
+.cal-legend > span{display:inline-flex;align-items:center;gap:5px}
+@media (max-width:600px){
+  .cal{padding:8px 6px 10px}
+  .cal-grid{gap:3px}
+  .cal-day{min-height:54px;align-items:center;padding:5px 2px}
+  .cal-ev,.cal-more{display:none}
+  .cal-dots{display:flex}
+  .cal-num{font-size:13px}
+}
+.day-form{border-top:1px solid var(--line)}
+.quick{display:flex;flex-wrap:wrap;gap:6px}
+.quick button{border:1px dashed var(--line);background:var(--bg);border-radius:99px;padding:4px 11px;font-size:13px;cursor:pointer;color:var(--ink)}
+.quick button:hover{border-color:var(--accent);border-style:solid}
+input[type=time]{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-height:40px}
 .hero{position:relative;border-radius:var(--r);overflow:hidden;background:#000;aspect-ratio:16/9;max-height:340px;width:100%}
 .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 16%}
 .hero-txt{position:absolute;inset:auto 0 0 0;padding:40px 18px 14px;background:linear-gradient(to top,rgb(20 8 26 / .85),rgb(20 8 26 / 0));color:#fff;display:grid;gap:2px}
@@ -201,6 +241,7 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
 
 <main><div class="wrap">
   <div class="status" id="status">Conectando con los datos del hogar…</div>
+  <a class="alertbar" id="alertbar" href="#aseo" hidden></a>
 
   <!-- INGRESO -->
   <section id="login" class="login" hidden>
@@ -267,15 +308,53 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
   <!-- ASEO -->
   <section class="view" id="v-aseo" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Aseo</h2><span class="sub">Rutinas que se repiten cada cierto tiempo</span></div>
+      <div class="sec-h"><h2>Calendario de aseo</h2><span class="sub">Toca un día para ver o agregar tareas</span></div>
+      <div class="panel cal">
+        <div class="cal-head">
+          <button type="button" class="btn small ghost" data-action="calPrev" aria-label="Mes anterior">‹</button>
+          <h3 id="calTitle"></h3>
+          <button type="button" class="btn small ghost" data-action="calNext" aria-label="Mes siguiente">›</button>
+          <button type="button" class="btn small" data-action="calToday">Hoy</button>
+        </div>
+        <div class="cal-grid cal-dow"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend"><span><i class="dot a"></i><span id="legA"></span></span><span><i class="dot b"></i><span id="legB"></span></span><span><i class="dot ambos"></i>Juntos</span><span><i class="dot late"></i>Atrasada</span><span><i class="dot done"></i>Hecha</span></div>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:18px">
+      <div class="sec-h"><h2 id="dayTitle"></h2><span class="sub" id="daySub"></span></div>
       <div class="panel">
-        <form class="form" data-form="aseo">
-          <input type="text" class="grow" id="aName" name="name" placeholder="Tarea (ej. Limpiar el baño)" maxlength="60" required>
-          <label class="sub" style="display:flex;align-items:center;gap:6px">cada <input type="number" id="aFreq" name="freq" min="1" max="365" value="7" style="width:70px"> días</label>
-          <select id="aWho" name="who" aria-label="Responsable"></select>
+        <ul class="list" id="dayList"></ul>
+        <form class="form day-form" data-form="dia">
+          <span class="eyebrow" style="flex-basis:100%">Agregar tarea para este día</span>
+          <div class="quick" id="quick" style="flex-basis:100%"></div>
+          <input type="text" class="grow" id="dTitle" name="title" placeholder="Tarea (ej. Sacar la basura)" maxlength="60" required>
+          <select id="dWho" name="who" aria-label="Responsable"></select>
+          <select id="dRep" name="rep" aria-label="Repetir">
+            <option value="0">Solo este día</option>
+            <option value="1">Todos los días</option>
+            <option value="2">Cada 2 días</option>
+            <option value="3">Cada 3 días</option>
+            <option value="7">Cada semana</option>
+            <option value="14">Cada 2 semanas</option>
+            <option value="30">Cada mes</option>
+          </select>
           <button class="btn primary">Agregar</button>
         </form>
-        <ul class="list" id="aseoList" style="border-top:1px solid var(--line)"></ul>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Rutinas</h2><span class="sub">Tareas que se repiten</span></div>
+      <div class="panel"><ul class="list" id="aseoList"></ul></div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Alertas en el celular</h2></div>
+      <div class="panel settings">
+        <span class="sub">Descarga las rutinas y tareas al calendario de tu celular para que te lleguen avisos aunque la app esté cerrada. Si cambian las rutinas, vuelve a descargarlas.</span>
+        <div class="form" style="padding:0">
+          <label class="sub" style="display:flex;align-items:center;gap:6px">Avisar a las <input type="time" id="icsTime" value="09:00" style="width:auto"></label>
+          <button type="button" class="btn primary" data-action="ics">Agregar a mi calendario</button>
+        </div>
       </div>
     </div>
     <div class="sec" style="margin-top:22px">
@@ -331,8 +410,8 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
 <script>
 (function(){
 "use strict";
-const COLS=['tareas','aseo','compras','precios'];
-const S={config:{names:{a:'',b:''},stores:[],currency:'$'},tareas:[],aseo:[],compras:[],precios:[]};
+const COLS=['tareas','aseo','compras','precios','agenda'];
+const S={config:{names:{a:'',b:''},stores:[],currency:'$'},tareas:[],aseo:[],compras:[],precios:[],agenda:[]};
 let sb=null, session=null, channel=null;
 const $=id=>document.getElementById(id);
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}};
@@ -434,14 +513,37 @@ async function claimMe(k){
 }
 
 /* ---------- datos derivados ---------- */
+const freqOf=c=>Math.max(1,Number(c.freq)||7);
+function choreBase(c){ return c.lastDone?addDays(c.lastDone,freqOf(c)):(c.start||today()) }
 function choreState(c){
-  const t=today();
-  if(!c.lastDone) return {due:t,days:0,label:'Nunca hecha',cls:'today'};
-  const due=addDays(c.lastDone,Number(c.freq)||7), d=diffDays(t,due);
+  const t=today(), due=choreBase(c), d=diffDays(t,due);
   if(d<0) return {due,days:d,label:`Atrasada ${-d} d`,cls:'late'};
   if(d===0) return {due,days:0,label:'Toca hoy',cls:'today'};
   return {due,days:d,label:d===1?'Mañana':`En ${d} días`,cls:'ok'};
 }
+/* Lo que aparece en el calendario entre dos fechas (YYYY-MM-DD, inclusive) */
+function calItems(from,to){
+  const t=today(), out=[];
+  for(const c of S.aseo){
+    const f=freqOf(c);
+    for(const h of (c.history||[])) if(h.d>=from&&h.d<=to) out.push({kind:'hist',date:h.d,title:c.name,who:h.by,done:true,c});
+    let d=choreBase(c), i=0;
+    if(d<t){ if(t>=from&&t<=to) out.push({kind:'chore',date:t,title:c.name,who:choreWho(c),late:diffDays(d,t),c}); d=addDays(t,f); i=1 }
+    if(d<from){ const k=Math.ceil(diffDays(d,from)/f); d=addDays(d,k*f); i+=k }
+    for(let n=0;d<=to&&n<400;n++,i++){
+      const who=c.who==='alterna'?(i%2?other(c.turn||'a'):(c.turn||'a')):(c.who||'ambos');
+      if(!(c.lastDone===d)) out.push({kind:'chore',date:d,title:c.name,who,c});
+      d=addDays(d,f);
+    }
+  }
+  for(const a of S.agenda){
+    if(a.done){ const dd=a.doneOn||a.date; if(dd>=from&&dd<=to) out.push({kind:'agenda',date:dd,title:a.title,who:a.doneBy||a.who,done:true,a}); continue }
+    if(a.date<t){ if(t>=from&&t<=to) out.push({kind:'agenda',date:t,title:a.title,who:a.who,late:diffDays(a.date,t),a}) }
+    else if(a.date>=from&&a.date<=to) out.push({kind:'agenda',date:a.date,title:a.title,who:a.who,a});
+  }
+  return out;
+}
+const dueNow=()=>calItems(today(),today()).filter(x=>!x.done);
 function choreWho(c){ return c.who==='alterna' ? (c.turn||'a') : (c.who||'ambos') }
 function dueChip(due){
   if(!due) return '';
@@ -465,9 +567,9 @@ function renderChrome(){
   $('meSeg').innerHTML=['a','b'].map(k=>`<button type="button" data-action="me" data-k="${k}" aria-pressed="${me===k}">${esc(nameOf(k))}</button>`).join('');
   const opts=k=>`<option value="${k}">${esc(k==='ambos'?'Juntos':k===me?nameOf(k)+' (yo)':nameOf(k))}</option>`;
   fillSelect('tOwner',[me,other(me),'ambos'].map(opts).join(''));
-  fillSelect('aWho',[opts('a'),opts('b'),'<option value="alterna">Por turnos</option>',opts('ambos')].join(''));
+  fillSelect('dWho',[opts(me),opts(other(me)),opts('ambos'),'<option value="alterna">Por turnos (si se repite)</option>'].join(''));
   const openPend=S.tareas.filter(t=>!t.done&&(t.owner===me||t.owner==='ambos')).length;
-  const lateChores=S.aseo.filter(c=>choreState(c).days<=0).length;
+  const lateChores=dueNow().length;
   const toBuy=S.compras.filter(c=>!c.checked).length;
   setBadge('b-pend',openPend,false); setBadge('b-aseo',lateChores,lateChores>0); setBadge('b-comp',toBuy,false);
   for(const [i,id] of [['nameA','a'],['nameB','b']]) if(document.activeElement!==$(i)) $(i).value=S.config.names[id]||'';
@@ -485,8 +587,8 @@ function renderInicio(){
   $('todayLabel').textContent=new Date().toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'});
   const mine=S.tareas.filter(t=>!t.done&&t.owner===me).length;
   const both=S.tareas.filter(t=>!t.done&&t.owner==='ambos').length;
-  const late=S.aseo.filter(c=>choreState(c).days<0).length;
-  const dueToday=S.aseo.filter(c=>choreState(c).days<=0).length;
+  const now=dueNow(), late=now.filter(x=>x.late).length;
+  const dueToday=now.length;
   const buy=S.compras.filter(c=>!c.checked).length;
   $('stats').innerHTML=`
     <a class="stat" href="#pendientes"><b>${mine}</b><span>Pendientes tuyos</span></a>
@@ -496,7 +598,8 @@ function renderInicio(){
   const t=today();
   const chores=S.aseo.map(c=>({c,s:choreState(c)})).filter(x=>x.s.days<=0).sort((x,y)=>x.s.days-y.s.days);
   const tasks=S.tareas.filter(x=>!x.done&&x.due&&x.due<=t).sort((a,b)=>a.due.localeCompare(b.due));
-  if(!chores.length&&!tasks.length){
+  const ag=S.agenda.filter(a=>!a.done&&a.date<=t).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!chores.length&&!tasks.length&&!ag.length){
     $('todayList').innerHTML=`<li class="empty"><strong>Nada urgente hoy</strong><span>Cuando una tarea de aseo toque o un pendiente venza, aparecerá aquí.</span></li>`;
     return;
   }
@@ -504,6 +607,10 @@ function renderInicio(){
     <li><div class="li-main"><span class="li-title">${esc(c.name)}</span>
       <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${whoPill(choreWho(c))}<span>Aseo</span></span></div>
       <button class="btn small" data-action="choreDone" data-id="${c.id}">Hecho</button></li>`).join('')+
+    ag.map(a=>`
+    <li><div class="li-main"><span class="li-title">${esc(a.title)}</span>
+      <span class="li-meta">${a.date<t?`<span class="chip late">Atrasada ${diffDays(a.date,t)} d</span>`:'<span class="chip today">Hoy</span>'}${whoPill(a.who)}<span>Calendario</span></span></div>
+      <button class="btn small" data-action="agDone" data-id="${a.id}">Hecho</button></li>`).join('')+
     tasks.map(x=>`
     <li><input type="checkbox" class="check" data-action="toggleTask" data-id="${x.id}" aria-label="Completar ${esc(x.title)}">
       <div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta">${dueChip(x.due)}${whoPill(x.owner)}</span></div></li>`).join('');
@@ -528,16 +635,60 @@ function renderPend(){
 }
 
 const SUGERIDAS=[['Lavar los platos',1,'alterna'],['Sacar la basura',2,'alterna'],['Regar las plantas',3,'a'],['Barrer y trapear',7,'alterna'],['Limpiar el baño',7,'alterna'],['Lavar la ropa',7,'ambos'],['Cambiar las sábanas',14,'ambos'],['Limpiar el refrigerador',30,'ambos']];
+let calY=new Date().getFullYear(), calM=new Date().getMonth(), selDay=today();
+const QUICK=['Sacar la basura','Lavar el baño','Limpiar la nevera','Lavar los platos','Barrer y trapear','Lavar la ropa','Cambiar las sábanas','Regar las plantas'];
+function longDate(s){ const x=parseD(s).toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'}); return x.charAt(0).toUpperCase()+x.slice(1) }
+function renderCal(){
+  const first=new Date(calY,calM,1), lead=(first.getDay()+6)%7, start=addDays(fmtD(first),-lead);
+  const last=new Date(calY,calM+1,0), trail=(7-((last.getDay()+6)%7)-1), end=addDays(fmtD(last),trail);
+  $('calTitle').textContent=first.toLocaleDateString('es',{month:'long',year:'numeric'});
+  const items=calItems(start,end), by={};
+  for(const x of items)(by[x.date]=by[x.date]||[]).push(x);
+  const t=today(), mm=calM; let html='';
+  for(let d=start;d<=end;d=addDays(d,1)){
+    const list=(by[d]||[]).sort((x,y)=>(x.done?1:0)-(y.done?1:0)||(y.late||0)-(x.late||0));
+    const cls=x=>x.done?'done':x.late?'late':(x.who||'ambos');
+    const ev=list.slice(0,3).map(x=>`<span class="cal-ev ${cls(x)}">${x.done?'✓ ':''}${esc(x.title)}</span>`).join('');
+    const more=list.length>3?`<span class="cal-more">+${list.length-3} más</span>`:'';
+    const dots=list.slice(0,6).map(x=>`<i class="dot ${cls(x)}"></i>`).join('');
+    html+=`<button type="button" class="cal-day${parseD(d).getMonth()!==mm?' out':''}${d===t?' today':''}${d===selDay?' sel':''}" data-action="pickDay" data-d="${d}" aria-label="${esc(longDate(d))}: ${list.length} tareas"><span class="cal-num">${parseD(d).getDate()}</span>${ev}${more}<span class="cal-dots">${dots}</span></button>`;
+  }
+  $('calGrid').innerHTML=html;
+  $('legA').textContent=nameOf('a'); $('legB').textContent=nameOf('b');
+  // día elegido
+  const t2=today(), day=calItems(selDay,selDay);
+  $('dayTitle').textContent=selDay===t2?'Hoy · '+longDate(selDay):longDate(selDay);
+  $('daySub').textContent=day.length?`${day.filter(x=>!x.done).length} pendiente(s)`:'';
+  $('dayList').innerHTML=day.length?day.map(x=>{
+    const meta=`${x.late?`<span class="chip late">Atrasada ${x.late} d</span>`:''}${whoPill(x.who||'ambos')}${x.c?`<span>${freqOf(x.c)===1?'todos los días':'cada '+freqOf(x.c)+' días'}</span>`:'<span>solo este día</span>'}`;
+    if(x.done) return `<li class="done"><div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta"><span class="chip ok">Hecha</span>${whoPill(x.who||'ambos')}</span></div>${x.a?`<button class="x" data-action="delAg" data-id="${x.a.id}" data-confirm aria-label="Borrar">×</button>`:''}</li>`;
+    const canDo=x.date<=t2;
+    const btn=x.c?(canDo?`<button class="btn small primary" data-action="choreDone" data-id="${x.c.id}">Hecho</button>`:''):`<button class="btn small ${canDo?'primary':''}" data-action="agDone" data-id="${x.a.id}">Hecho</button>`;
+    const delb=x.a?`<button class="x" data-action="delAg" data-id="${x.a.id}" data-confirm aria-label="Borrar">×</button>`:`<button class="x" data-action="delChore" data-id="${x.c.id}" data-confirm aria-label="Borrar rutina">×</button>`;
+    return `<li><div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta">${meta}</span></div>${btn}${delb}</li>`;
+  }).join(''):`<li class="empty"><strong>Nada para este día</strong><span>Agrega una tarea abajo. Si se repite, elige cada cuánto.</span></li>`;
+  $('quick').innerHTML=QUICK.map(q=>`<button type="button" data-action="quick" data-q="${esc(q)}">${esc(q)}</button>`).join('');
+}
+function renderAlerts(){
+  const bar=$('alertbar'); if(!session){bar.hidden=true;return}
+  const mine=dueNow().filter(x=>x.who===me||x.who==='ambos');
+  if(!mine.length){bar.hidden=true;return}
+  const late=mine.filter(x=>x.late).length;
+  bar.innerHTML=`<svg class="bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span><b>Hoy te toca:</b> ${mine.map(x=>esc(x.title)+(x.late?` <b>(atrasada ${x.late} d)</b>`:'')).join(', ')}</span>`;
+  bar.hidden=false;
+}
 function renderAseo(){
+  renderCal(); renderAlerts();
   const rows=S.aseo.map(c=>({c,s:choreState(c)})).sort((x,y)=>x.s.days-y.s.days||norm(x.c.name).localeCompare(norm(y.c.name)));
   $('aseoList').innerHTML=rows.length?rows.map(({c,s})=>`
     <li><div class="li-main"><span class="li-title">${esc(c.name)}</span>
       <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${c.who==='alterna'?`<span>Turno de</span>`:''}${whoPill(choreWho(c))}<span>cada ${Number(c.freq)||7} d</span>${c.lastDone?`<span>· última ${esc(shortDate(c.lastDone))}${c.lastBy?' por '+esc(nameOf(c.lastBy)):''}</span>`:''}</span></div>
       <button class="btn small ${s.days<=0?'primary':''}" data-action="choreDone" data-id="${c.id}">Hecho</button>
       <button class="x" data-action="delChore" data-id="${c.id}" data-confirm aria-label="Borrar">×</button></li>`).join('')
-    :`<li class="empty"><strong>Aún no hay rutinas de aseo</strong><span>Agrega la primera arriba, o empieza con una lista típica y ajústala.</span><button class="btn" data-action="seedAseo">Cargar rutina sugerida</button></li>`;
+    :`<li class="empty"><strong>Aún no hay rutinas de aseo</strong><span>Agrégalas desde el calendario eligiendo cada cuánto se repiten, o empieza con una lista típica.</span><button class="btn" data-action="seedAseo">Cargar rutina sugerida</button></li>`;
   const since=addDays(today(),-30); const cnt={a:0,b:0};
   for(const c of S.aseo) for(const h of (c.history||[])) if(h.d>=since&&cnt[h.by]!==undefined) cnt[h.by]++;
+  for(const a of S.agenda) if(a.done&&(a.doneOn||'')>=since&&cnt[a.doneBy]!==undefined) cnt[a.doneBy]++;
   const tot=cnt.a+cnt.b;
   $('balance').innerHTML=tot?`
     <div class="bar"><i class="a" style="width:${cnt.a/tot*100}%"></i><i class="b" style="width:${cnt.b/tot*100}%"></i></div>
@@ -599,6 +750,31 @@ function renderPrecios(){
 }
 $('priceTable').addEventListener('focusout',()=>setTimeout(()=>{if(tableDirty&&!$('priceTable').contains(document.activeElement))renderPrecios()},0));
 
+/* ---------- alertas en el calendario del celular (.ics) ---------- */
+function icsEsc(t){ return String(t).replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\n/g,'\\n') }
+function downloadIcs(){
+  const hm=($('icsTime').value||'09:00').replace(':','')+'00';
+  const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'');
+  const t=today(), L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Hogar EM//ES','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Hogar E&M'];
+  const ev=(uid,date,title,who,rrule)=>{
+    const label=who==='alterna'?'por turnos':nameOf(who);
+    L.push('BEGIN:VEVENT','UID:'+uid+'@hogar-em','DTSTAMP:'+stamp,'DTSTART:'+date.replace(/-/g,'')+'T'+hm,'DURATION:PT15M');
+    if(rrule) L.push('RRULE:'+rrule);
+    L.push('SUMMARY:'+icsEsc(title+' ('+label+')'),'DESCRIPTION:'+icsEsc('Hogar E&M · márcala como hecha en la app'),
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(title),'TRIGGER:PT0M','END:VALARM','END:VEVENT');
+  };
+  let n=0;
+  for(const c of S.aseo){ const b=choreBase(c); ev('aseo-'+c.id,b<t?t:b,c.name,c.who||'ambos','FREQ=DAILY;INTERVAL='+freqOf(c)); n++ }
+  for(const a of S.agenda) if(!a.done&&a.date>=t){ ev('agenda-'+a.id,a.date,a.title,a.who||'ambos',null); n++ }
+  if(!n){ toast('Primero agrega tareas al calendario'); return }
+  L.push('END:VCALENDAR');
+  const blob=new Blob([L.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob), link=document.createElement('a');
+  link.href=url; link.download='hogar-em-aseo.ics'; document.body.appendChild(link); link.click(); link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  toast(`${n} tarea(s) listas para tu calendario`);
+}
+
 /* ---------- vistas ---------- */
 const VIEWS=['inicio','pendientes','aseo','compras','precios'];
 function showView(){
@@ -633,7 +809,15 @@ document.addEventListener('click',async e=>{
       toast(`“${c.name}” marcada como hecha`); break;
     }
     case 'delChore': del('aseo',id); break;
-    case 'seedAseo': for(const [name,freq,who] of SUGERIDAS) await put('aseo',null,{name,freq,who,turn:'a',lastDone:null,history:[],created:Date.now()}); toast('Rutina cargada. Ajusta o borra lo que no uses.'); break;
+    case 'calPrev': calM--; if(calM<0){calM=11;calY--} renderCal(); break;
+    case 'calNext': calM++; if(calM>11){calM=0;calY++} renderCal(); break;
+    case 'calToday': { const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); selDay=today(); renderCal(); break }
+    case 'pickDay': selDay=b.dataset.d; { const d=parseD(selDay); if(d.getMonth()!==calM){calY=d.getFullYear();calM=d.getMonth()} } renderCal(); $('dayTitle').scrollIntoView({behavior:'smooth',block:'start'}); break;
+    case 'quick': $('dTitle').value=b.dataset.q; $('dTitle').focus(); break;
+    case 'agDone': { const a=S.agenda.find(x=>x.id===id); if(!a) break; await patch('agenda',id,{done:true,doneOn:today(),doneBy:me}); toast(`“${a.title}” marcada como hecha`); break }
+    case 'delAg': del('agenda',id); break;
+    case 'ics': downloadIcs(); break;
+    case 'seedAseo': for(const [name,freq,who] of SUGERIDAS) await put('aseo',null,{name,freq,who,turn:'a',start:today(),lastDone:null,history:[],created:Date.now()}); toast('Rutina cargada. Ajusta o borra lo que no uses.'); break;
     case 'delBuy': del('compras',id); break;
     case 'clearCart': for(const x of S.compras.filter(x=>x.checked)) await del('compras',x.id); toast('Lista limpia'); break;
     case 'delProd': del('precios',id); break;
@@ -657,6 +841,13 @@ document.addEventListener('submit',async e=>{
   const f=e.target, kind=f.dataset.form; if(!kind) return; e.preventDefault(); const fd=new FormData(f);
   const val=k=>String(fd.get(k)||'').trim();
   if(kind==='tarea'){ if(!val('title'))return; await put('tareas',null,{title:val('title'),owner:val('owner')||me,due:val('due')||null,done:false,by:me,created:Date.now()}); $('tTitle').value=''; $('tDue').value=''; $('tTitle').focus() }
+  else if(kind==='dia'){
+    const title=val('title'); if(!title) return;
+    const rep=parseInt(val('rep'))||0; let who=val('who')||me;
+    if(rep>0){ await put('aseo',null,{name:title,freq:rep,who,turn:who==='alterna'?me:'a',start:selDay,lastDone:null,history:[],created:Date.now()}) }
+    else { if(who==='alterna') who=me; await put('agenda',null,{title,date:selDay,who,done:false,by:me,created:Date.now()}) }
+    toast(rep>0?'Rutina agregada al calendario':'Tarea agregada'); $('dTitle').value=''; $('dRep').value='0';
+  }
   else if(kind==='aseo'){ if(!val('name'))return; const freq=Math.max(1,Math.min(365,parseInt(val('freq'))||7)); await put('aseo',null,{name:val('name'),freq,who:val('who')||'alterna',turn:'a',lastDone:null,history:[],created:Date.now()}); $('aName').value=''; $('aName').focus() }
   else if(kind==='compra'){ if(!val('name'))return; await put('compras',null,{name:val('name'),qty:val('qty'),checked:false,by:me,created:Date.now()}); $('cName').value=''; $('cQty').value=''; $('cName').focus() }
   else if(kind==='producto'){ const n=val('name'); if(!n)return; if(priceIndex().has(norm(n))){toast('Ese producto ya está en el comparador');return} await put('precios',null,{name:n,unit:val('unit'),prices:{},created:Date.now()}); $('pName').value=''; $('pUnit').value=''; $('pName').focus() }
@@ -680,7 +871,7 @@ function onSession(s){
   if(!s){
     if(channel){sb.removeChannel(channel);channel=null}
     try{localStorage.removeItem('hogar.cache')}catch(e){}
-    $('status').textContent=''; showApp(false); return;
+    $('status').textContent=''; $('alertbar').hidden=true; showApp(false); return;
   }
   if(was===s.user.id) return;
   showApp(true); cacheLoad(); render(); window.scrollTo(0,0);
