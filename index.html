@@ -130,10 +130,12 @@ details.more summary span{flex:1}
 .bar .a{background:var(--pa)} .bar .b{background:var(--pb)}
 .balance-legend{display:flex;justify-content:space-between;font-size:13px;font-variant-numeric:tabular-nums;gap:8px;flex-wrap:wrap}
 
-.tablewrap{overflow-x:auto}
+.tablewrap{overflow:auto;max-height:min(70vh,640px);overscroll-behavior:contain}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:8px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
-th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-top:0;vertical-align:bottom}
+th{font-size:12px;color:var(--ink);font-weight:700;text-transform:uppercase;letter-spacing:.05em;border-top:0;vertical-align:bottom;position:sticky;top:0;z-index:2;background:var(--surface-2);box-shadow:0 1px 0 var(--line)}
+td:first-child{position:sticky;left:0;z-index:1;background:var(--surface);box-shadow:1px 0 0 var(--line)}
+th:first-child{left:0;z-index:3}
 th:first-child,td:first-child{text-align:left;white-space:normal;min-width:130px}
 td input[type=number]{width:92px;text-align:right;padding:6px 8px;min-height:34px}
 @media (max-width:460px){nav a{padding:9px 8px 11px;font-size:14px}}
@@ -195,6 +197,25 @@ td.best input{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);f
   .cal-num{font-size:13px}
 }
 .day-form{border-top:1px solid var(--line)}
+.rep-wrap{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:14px}
+.rep-wrap input{width:64px!important}
+.rep-wrap select{width:auto}
+.freq-edit{display:inline-flex;align-items:center;gap:4px}
+.freq-edit input[type=number]{width:52px;min-height:28px;padding:2px 6px;font-size:12.5px}
+.freq-edit select{width:auto;min-height:28px;padding:2px 6px;font-size:12.5px}
+.wk{padding:10px 10px 12px;display:grid;gap:8px}
+.wk-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;overflow-x:auto;scroll-snap-type:x proximity}
+.wk-day{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:6px;display:flex;flex-direction:column;gap:4px;min-height:96px;min-width:0;scroll-snap-align:start}
+.wk-day.today{background:var(--accent-soft);border-color:var(--accent)}
+.wk-h{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;font-weight:700;color:var(--muted);padding:0 2px 2px;border:0;background:none;cursor:pointer;font:inherit}
+.wk-h b{font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums}
+.wk-day.today .wk-h b{color:var(--accent)}
+.wk-it{display:block;text-align:left;border:0;cursor:pointer;font:inherit;font-size:12px;line-height:1.3;padding:4px 6px;border-radius:7px;font-weight:600;overflow-wrap:anywhere}
+.wk-it.a{background:var(--pa-soft);color:var(--pa)} .wk-it.b{background:var(--pb-soft);color:var(--pb)} .wk-it.ambos{background:var(--both-soft);color:var(--both)}
+.wk-it.late{background:var(--warn);color:#fff} .wk-it.done{background:transparent;color:var(--muted);text-decoration:line-through;font-weight:500}
+.wk-it.tarea{box-shadow:inset 3px 0 0 currentColor}
+.wk-empty{font-size:12px;color:var(--muted);padding:2px 4px}
+@media (max-width:760px){.wk-row{grid-template-columns:repeat(7,128px)}}
 .quick{display:flex;flex-wrap:wrap;gap:6px}
 .quick button{border:1px dashed var(--line);background:var(--bg);border-radius:99px;padding:4px 11px;font-size:13px;cursor:pointer;color:var(--ink)}
 .quick button:hover{border-color:var(--accent);border-style:solid}
@@ -231,6 +252,7 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
     </div>
     <nav id="nav" aria-label="Secciones" hidden>
       <a href="#inicio" data-v="inicio">Inicio</a>
+      <a href="#calendario" data-v="calendario">Calendario</a>
       <a href="#pendientes" data-v="pendientes">Pendientes <span class="badge" id="b-pend"></span></a>
       <a href="#aseo" data-v="aseo">Aseo <span class="badge" id="b-aseo"></span></a>
       <a href="#compras" data-v="compras">Compras <span class="badge" id="b-comp"></span></a>
@@ -241,7 +263,6 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
 
 <main><div class="wrap">
   <div class="status" id="status">Conectando con los datos del hogar…</div>
-  <a class="alertbar" id="alertbar" href="#aseo" hidden></a>
 
   <!-- INGRESO -->
   <section id="login" class="login" hidden>
@@ -305,10 +326,21 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
     </div>
   </section>
 
-  <!-- ASEO -->
-  <section class="view" id="v-aseo" hidden>
+  <!-- CALENDARIO -->
+  <section class="view" id="v-calendario" hidden>
     <div class="sec">
-      <div class="sec-h"><h2>Calendario de aseo</h2><span class="sub">Toca un día para ver o agregar tareas</span></div>
+      <div class="sec-h"><h2>Pendientes de la semana</h2><span class="sub">Domingo a sábado · toca una tarea para ver el día</span></div>
+      <div class="panel wk">
+        <div class="cal-head">
+          <button type="button" class="btn small ghost" data-action="wkPrev" aria-label="Semana anterior">‹</button>
+          <h3 id="wkTitle"></h3>
+          <button type="button" class="btn small ghost" data-action="wkNext" aria-label="Semana siguiente">›</button>
+        </div>
+        <div class="wk-row" id="wkRow"></div>
+      </div>
+    </div>
+    <div class="sec" style="margin-top:22px">
+      <div class="sec-h"><h2>Calendario</h2><span class="sub">Toca un día para ver o agregar tareas</span></div>
       <div class="panel cal">
         <div class="cal-head">
           <button type="button" class="btn small ghost" data-action="calPrev" aria-label="Mes anterior">‹</button>
@@ -316,7 +348,7 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
           <button type="button" class="btn small ghost" data-action="calNext" aria-label="Mes siguiente">›</button>
           <button type="button" class="btn small" data-action="calToday">Hoy</button>
         </div>
-        <div class="cal-grid cal-dow"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+        <div class="cal-grid cal-dow"><span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span></div>
         <div class="cal-grid" id="calGrid"></div>
         <div class="cal-legend"><span><i class="dot a"></i><span id="legA"></span></span><span><i class="dot b"></i><span id="legB"></span></span><span><i class="dot ambos"></i>Juntos</span><span><i class="dot late"></i>Atrasada</span><span><i class="dot done"></i>Hecha</span></div>
       </div>
@@ -328,34 +360,42 @@ input[type=email],input[type=password]{background:var(--bg);border:1px solid var
         <form class="form day-form" data-form="dia">
           <span class="eyebrow" style="flex-basis:100%">Agregar tarea para este día</span>
           <div class="quick" id="quick" style="flex-basis:100%"></div>
-          <input type="text" class="grow" id="dTitle" name="title" placeholder="Tarea (ej. Sacar la basura)" maxlength="60" required>
+          <input type="text" class="grow" id="dTitle" name="title" placeholder="Tarea (ej. Limpiar la nevera)" maxlength="60" required>
           <select id="dWho" name="who" aria-label="Responsable"></select>
-          <select id="dRep" name="rep" aria-label="Repetir">
-            <option value="0">Solo este día</option>
-            <option value="1">Todos los días</option>
-            <option value="2">Cada 2 días</option>
-            <option value="3">Cada 3 días</option>
-            <option value="7">Cada semana</option>
-            <option value="14">Cada 2 semanas</option>
-            <option value="30">Cada mes</option>
+          <select id="dMode" name="mode" aria-label="Repetir">
+            <option value="once">Solo este día</option>
+            <option value="rep">Se repite…</option>
           </select>
+          <span class="rep-wrap" id="repWrap" hidden>cada
+            <input type="number" id="dRepN" name="n" min="1" max="52" value="1" aria-label="Cada cuántos">
+            <select id="dRepU" name="unit" aria-label="Unidad">
+              <option value="d">días</option>
+              <option value="w" selected>semanas</option>
+              <option value="m">meses</option>
+            </select>
+          </span>
           <button class="btn primary">Agregar</button>
         </form>
       </div>
     </div>
     <div class="sec" style="margin-top:22px">
-      <div class="sec-h"><h2>Rutinas</h2><span class="sub">Tareas que se repiten</span></div>
-      <div class="panel"><ul class="list" id="aseoList"></ul></div>
-    </div>
-    <div class="sec" style="margin-top:22px">
       <div class="sec-h"><h2>Alertas en el celular</h2></div>
       <div class="panel settings">
-        <span class="sub">Descarga las rutinas y tareas al calendario de tu celular para que te lleguen avisos aunque la app esté cerrada. Si cambian las rutinas, vuelve a descargarlas.</span>
+        <span class="sub">Descarga las tareas al calendario de tu celular para que te lleguen avisos aunque la app esté cerrada. Si cambian las rutinas, vuelve a descargarlas.</span>
         <div class="form" style="padding:0">
           <label class="sub" style="display:flex;align-items:center;gap:6px">Avisar a las <input type="time" id="icsTime" value="09:00" style="width:auto"></label>
           <button type="button" class="btn primary" data-action="ics">Agregar a mi calendario</button>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ASEO -->
+  <section class="view" id="v-aseo" hidden>
+    <a class="alertbar" id="alertbar" href="#calendario" hidden></a>
+    <div class="sec" style="margin-top:14px">
+      <div class="sec-h"><h2>Rutinas de aseo</h2><span class="sub">Cambia cada cuánto se repite cada una</span></div>
+      <div class="panel"><ul class="list" id="aseoList"></ul></div>
     </div>
     <div class="sec" style="margin-top:22px">
       <div class="sec-h"><h2>Reparto</h2><span class="sub">Tareas de aseo hechas en los últimos 30 días</span></div>
@@ -514,6 +554,12 @@ async function claimMe(k){
 
 /* ---------- datos derivados ---------- */
 const freqOf=c=>Math.max(1,Number(c.freq)||7);
+const UNIT_DAYS={d:1,w:7,m:30};
+function freqParts(c){ if(c.unit&&c.n) return {n:c.n,unit:c.unit}; const f=freqOf(c); if(f%30===0) return {n:f/30,unit:'m'}; if(f%7===0) return {n:f/7,unit:'w'}; return {n:f,unit:'d'} }
+function freqLabel(c){ const {n,unit}=freqParts(c);
+  if(unit==='d') return n===1?'todos los días':`cada ${n} días`;
+  if(unit==='w') return n===1?'cada semana':`cada ${n} semanas`;
+  return n===1?'cada mes':`cada ${n} meses`; }
 function choreBase(c){ return c.lastDone?addDays(c.lastDone,freqOf(c)):(c.start||today()) }
 function choreState(c){
   const t=today(), due=choreBase(c), d=diffDays(t,due);
@@ -541,9 +587,14 @@ function calItems(from,to){
     if(a.date<t){ if(t>=from&&t<=to) out.push({kind:'agenda',date:t,title:a.title,who:a.who,late:diffDays(a.date,t),a}) }
     else if(a.date>=from&&a.date<=to) out.push({kind:'agenda',date:a.date,title:a.title,who:a.who,a});
   }
+  for(const k of S.tareas){
+    if(k.done||!k.due) continue;
+    const d=k.due<t?t:k.due;
+    if(d>=from&&d<=to) out.push({kind:'tarea',date:d,title:k.title,who:k.owner||'ambos',late:k.due<t?diffDays(k.due,t):0,t:k});
+  }
   return out;
 }
-const dueNow=()=>calItems(today(),today()).filter(x=>!x.done);
+const dueNow=()=>calItems(today(),today()).filter(x=>!x.done&&x.kind!=='tarea');
 function choreWho(c){ return c.who==='alterna' ? (c.turn||'a') : (c.who||'ambos') }
 function dueChip(due){
   if(!due) return '';
@@ -561,7 +612,7 @@ function bestPrice(p){
 
 /* ---------- render ---------- */
 function render(){
-  renderChrome(); renderInicio(); renderPend(); renderAseo(); renderCompras(); renderPrecios();
+  renderChrome(); renderInicio(); renderCalendario(); renderPend(); renderAseo(); renderCompras(); renderPrecios();
 }
 function renderChrome(){
   $('meSeg').innerHTML=['a','b'].map(k=>`<button type="button" data-action="me" data-k="${k}" aria-pressed="${me===k}">${esc(nameOf(k))}</button>`).join('');
@@ -638,19 +689,38 @@ const SUGERIDAS=[['Lavar los platos',1,'alterna'],['Sacar la basura',2,'alterna'
 let calY=new Date().getFullYear(), calM=new Date().getMonth(), selDay=today();
 const QUICK=['Sacar la basura','Lavar el baño','Limpiar la nevera','Lavar los platos','Barrer y trapear','Lavar la ropa','Cambiar las sábanas','Regar las plantas'];
 function longDate(s){ const x=parseD(s).toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long'}); return x.charAt(0).toUpperCase()+x.slice(1) }
+const itemCls=x=>x.done?'done':x.late?'late':(x.who||'ambos');
+const weekOf=s=>addDays(s,-parseD(s).getDay());
+let wkStart=weekOf(today());
+function renderWeek(){
+  const end=addDays(wkStart,6), t=today();
+  const f=d=>parseD(d).toLocaleDateString('es',{day:'numeric',month:'short'});
+  $('wkTitle').textContent=(wkStart<=t&&t<=end?'Esta semana · ':'')+f(wkStart)+' – '+f(end);
+  const items=calItems(wkStart,end), by={};
+  for(const x of items)(by[x.date]=by[x.date]||[]).push(x);
+  let html='';
+  for(let d=wkStart;d<=end;d=addDays(d,1)){
+    const list=(by[d]||[]).sort((x,y)=>(x.done?1:0)-(y.done?1:0)||(y.late||0)-(x.late||0));
+    const dn=parseD(d).toLocaleDateString('es',{weekday:'short'}).replace('.','');
+    html+=`<div class="wk-day${d===t?' today':''}" ${d===t?'id="wkToday"':''}><button type="button" class="wk-h" data-action="pickDay" data-d="${d}"><span>${esc(dn.charAt(0).toUpperCase()+dn.slice(1))}</span><b>${parseD(d).getDate()}</b></button>`+
+      (list.length?list.map(x=>`<button type="button" class="wk-it ${itemCls(x)}${x.kind==='tarea'?' tarea':''}" data-action="pickDay" data-d="${d}" title="${esc(nameOf(x.who||'ambos'))}">${x.done?'✓ ':''}${esc(x.title)}</button>`).join(''):'<span class="wk-empty">Libre</span>')+'</div>';
+  }
+  $('wkRow').innerHTML=html;
+}
+function scrollWeekToday(){ const td=$('wkToday'), row=$('wkRow'); if(td&&row.offsetParent) row.scrollLeft=Math.max(0,td.offsetLeft-row.offsetLeft-8) }
+function renderCalendario(){ renderWeek(); renderCal() }
 function renderCal(){
-  const first=new Date(calY,calM,1), lead=(first.getDay()+6)%7, start=addDays(fmtD(first),-lead);
-  const last=new Date(calY,calM+1,0), trail=(7-((last.getDay()+6)%7)-1), end=addDays(fmtD(last),trail);
+  const first=new Date(calY,calM,1), lead=first.getDay(), start=addDays(fmtD(first),-lead);
+  const last=new Date(calY,calM+1,0), trail=6-last.getDay(), end=addDays(fmtD(last),trail);
   $('calTitle').textContent=first.toLocaleDateString('es',{month:'long',year:'numeric'});
   const items=calItems(start,end), by={};
   for(const x of items)(by[x.date]=by[x.date]||[]).push(x);
   const t=today(), mm=calM; let html='';
   for(let d=start;d<=end;d=addDays(d,1)){
     const list=(by[d]||[]).sort((x,y)=>(x.done?1:0)-(y.done?1:0)||(y.late||0)-(x.late||0));
-    const cls=x=>x.done?'done':x.late?'late':(x.who||'ambos');
-    const ev=list.slice(0,3).map(x=>`<span class="cal-ev ${cls(x)}">${x.done?'✓ ':''}${esc(x.title)}</span>`).join('');
+    const ev=list.slice(0,3).map(x=>`<span class="cal-ev ${itemCls(x)}">${x.done?'✓ ':''}${esc(x.title)}</span>`).join('');
     const more=list.length>3?`<span class="cal-more">+${list.length-3} más</span>`:'';
-    const dots=list.slice(0,6).map(x=>`<i class="dot ${cls(x)}"></i>`).join('');
+    const dots=list.slice(0,6).map(x=>`<i class="dot ${itemCls(x)}"></i>`).join('');
     html+=`<button type="button" class="cal-day${parseD(d).getMonth()!==mm?' out':''}${d===t?' today':''}${d===selDay?' sel':''}" data-action="pickDay" data-d="${d}" aria-label="${esc(longDate(d))}: ${list.length} tareas"><span class="cal-num">${parseD(d).getDate()}</span>${ev}${more}<span class="cal-dots">${dots}</span></button>`;
   }
   $('calGrid').innerHTML=html;
@@ -660,9 +730,10 @@ function renderCal(){
   $('dayTitle').textContent=selDay===t2?'Hoy · '+longDate(selDay):longDate(selDay);
   $('daySub').textContent=day.length?`${day.filter(x=>!x.done).length} pendiente(s)`:'';
   $('dayList').innerHTML=day.length?day.map(x=>{
-    const meta=`${x.late?`<span class="chip late">Atrasada ${x.late} d</span>`:''}${whoPill(x.who||'ambos')}${x.c?`<span>${freqOf(x.c)===1?'todos los días':'cada '+freqOf(x.c)+' días'}</span>`:'<span>solo este día</span>'}`;
+    const meta=`${x.late?`<span class="chip late">Atrasada ${x.late} d</span>`:''}${whoPill(x.who||'ambos')}${x.c?`<span>${freqLabel(x.c)}</span>`:x.t?'<span>Pendiente</span>':'<span>solo este día</span>'}`;
     if(x.done) return `<li class="done"><div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta"><span class="chip ok">Hecha</span>${whoPill(x.who||'ambos')}</span></div>${x.a?`<button class="x" data-action="delAg" data-id="${x.a.id}" data-confirm aria-label="Borrar">×</button>`:''}</li>`;
     const canDo=x.date<=t2;
+    if(x.t) return `<li><input type="checkbox" class="check" data-action="toggleTask" data-id="${x.t.id}" aria-label="Completar ${esc(x.title)}"><div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta">${meta}</span></div></li>`;
     const btn=x.c?(canDo?`<button class="btn small primary" data-action="choreDone" data-id="${x.c.id}">Hecho</button>`:''):`<button class="btn small ${canDo?'primary':''}" data-action="agDone" data-id="${x.a.id}">Hecho</button>`;
     const delb=x.a?`<button class="x" data-action="delAg" data-id="${x.a.id}" data-confirm aria-label="Borrar">×</button>`:`<button class="x" data-action="delChore" data-id="${x.c.id}" data-confirm aria-label="Borrar rutina">×</button>`;
     return `<li><div class="li-main"><span class="li-title">${esc(x.title)}</span><span class="li-meta">${meta}</span></div>${btn}${delb}</li>`;
@@ -678,14 +749,15 @@ function renderAlerts(){
   bar.hidden=false;
 }
 function renderAseo(){
-  renderCal(); renderAlerts();
+  renderAlerts();
+  const ae=document.activeElement; if(ae&&ae.matches('input,select')&&$('aseoList').contains(ae)){ $('aseoList').addEventListener('focusout',()=>setTimeout(renderAseo,0),{once:true}); return }
   const rows=S.aseo.map(c=>({c,s:choreState(c)})).sort((x,y)=>x.s.days-y.s.days||norm(x.c.name).localeCompare(norm(y.c.name)));
   $('aseoList').innerHTML=rows.length?rows.map(({c,s})=>`
     <li><div class="li-main"><span class="li-title">${esc(c.name)}</span>
-      <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${c.who==='alterna'?`<span>Turno de</span>`:''}${whoPill(choreWho(c))}<span>cada ${Number(c.freq)||7} d</span>${c.lastDone?`<span>· última ${esc(shortDate(c.lastDone))}${c.lastBy?' por '+esc(nameOf(c.lastBy)):''}</span>`:''}</span></div>
+      <span class="li-meta"><span class="chip ${s.cls}">${s.label}</span>${c.who==='alterna'?`<span>Turno de</span>`:''}${whoPill(choreWho(c))}${(()=>{const fp=freqParts(c);return `<span class="freq-edit">cada <input type="number" min="1" max="52" value="${fp.n}" data-action="freqN" data-id="${c.id}" aria-label="Cada cuántos"><select data-action="freqU" data-id="${c.id}" aria-label="Unidad"><option value="d"${fp.unit==='d'?' selected':''}>días</option><option value="w"${fp.unit==='w'?' selected':''}>semanas</option><option value="m"${fp.unit==='m'?' selected':''}>meses</option></select></span>`})()}${c.lastDone?`<span>· última ${esc(shortDate(c.lastDone))}${c.lastBy?' por '+esc(nameOf(c.lastBy)):''}</span>`:''}</span></div>
       <button class="btn small ${s.days<=0?'primary':''}" data-action="choreDone" data-id="${c.id}">Hecho</button>
       <button class="x" data-action="delChore" data-id="${c.id}" data-confirm aria-label="Borrar">×</button></li>`).join('')
-    :`<li class="empty"><strong>Aún no hay rutinas de aseo</strong><span>Agrégalas desde el calendario eligiendo cada cuánto se repiten, o empieza con una lista típica.</span><button class="btn" data-action="seedAseo">Cargar rutina sugerida</button></li>`;
+    :`<li class="empty"><strong>Aún no hay rutinas de aseo</strong><span>Agrégalas desde la pestaña Calendario eligiendo cada cuánto se repiten, o empieza con una lista típica.</span><button class="btn" data-action="seedAseo">Cargar rutina sugerida</button></li>`;
   const since=addDays(today(),-30); const cnt={a:0,b:0};
   for(const c of S.aseo) for(const h of (c.history||[])) if(h.d>=since&&cnt[h.by]!==undefined) cnt[h.by]++;
   for(const a of S.agenda) if(a.done&&(a.doneOn||'')>=since&&cnt[a.doneBy]!==undefined) cnt[a.doneBy]++;
@@ -776,10 +848,11 @@ function downloadIcs(){
 }
 
 /* ---------- vistas ---------- */
-const VIEWS=['inicio','pendientes','aseo','compras','precios'];
+const VIEWS=['inicio','calendario','pendientes','aseo','compras','precios'];
 function showView(){
   const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'inicio';
   for(const k of VIEWS) $('v-'+k).hidden=k!==v;
+  if(v==='calendario') requestAnimationFrame(scrollWeekToday);
   document.querySelectorAll('#nav a').forEach(a=>{if(a.dataset.v===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
 }
 
@@ -811,8 +884,10 @@ document.addEventListener('click',async e=>{
     case 'delChore': del('aseo',id); break;
     case 'calPrev': calM--; if(calM<0){calM=11;calY--} renderCal(); break;
     case 'calNext': calM++; if(calM>11){calM=0;calY++} renderCal(); break;
-    case 'calToday': { const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); selDay=today(); renderCal(); break }
+    case 'calToday': { const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); selDay=today(); wkStart=weekOf(today()); renderCalendario(); scrollWeekToday(); break }
     case 'pickDay': selDay=b.dataset.d; { const d=parseD(selDay); if(d.getMonth()!==calM){calY=d.getFullYear();calM=d.getMonth()} } renderCal(); $('dayTitle').scrollIntoView({behavior:'smooth',block:'start'}); break;
+    case 'wkPrev': wkStart=addDays(wkStart,-7); renderWeek(); $('wkRow').scrollLeft=0; break;
+    case 'wkNext': wkStart=addDays(wkStart,7); renderWeek(); $('wkRow').scrollLeft=0; break;
     case 'quick': $('dTitle').value=b.dataset.q; $('dTitle').focus(); break;
     case 'agDone': { const a=S.agenda.find(x=>x.id===id); if(!a) break; await patch('agenda',id,{done:true,doneOn:today(),doneBy:me}); toast(`“${a.title}” marcada como hecha`); break }
     case 'delAg': del('agenda',id); break;
@@ -827,6 +902,11 @@ document.addEventListener('click',async e=>{
 document.addEventListener('change',e=>{
   const el=e.target, a=el.dataset.action, id=el.dataset.id;
   if(a==='toggleTask'){ patch('tareas',id,{done:el.checked,doneAt:el.checked?Date.now():null}) }
+  else if(a==='freqN'||a==='freqU'){
+    const w=el.closest('.freq-edit'), n=Math.max(1,Math.min(52,parseInt(w.querySelector('input').value)||1)), unit=w.querySelector('select').value;
+    patch('aseo',id,{n,unit,freq:n*UNIT_DAYS[unit]}).then(()=>toast('Frecuencia actualizada'));
+  }
+  else if(el.id==='dMode'){ $('repWrap').hidden=el.value!=='rep' }
   else if(a==='toggleBuy'){ patch('compras',id,{checked:el.checked}) }
   else if(a==='price'){
     const p=S.precios.find(x=>x.id===id); if(!p) return;
@@ -843,10 +923,11 @@ document.addEventListener('submit',async e=>{
   if(kind==='tarea'){ if(!val('title'))return; await put('tareas',null,{title:val('title'),owner:val('owner')||me,due:val('due')||null,done:false,by:me,created:Date.now()}); $('tTitle').value=''; $('tDue').value=''; $('tTitle').focus() }
   else if(kind==='dia'){
     const title=val('title'); if(!title) return;
-    const rep=parseInt(val('rep'))||0; let who=val('who')||me;
-    if(rep>0){ await put('aseo',null,{name:title,freq:rep,who,turn:who==='alterna'?me:'a',start:selDay,lastDone:null,history:[],created:Date.now()}) }
+    const repeat=val('mode')==='rep'; let who=val('who')||me;
+    const n=Math.max(1,Math.min(52,parseInt(val('n'))||1)), unit=val('unit')||'w';
+    if(repeat){ await put('aseo',null,{name:title,n,unit,freq:n*UNIT_DAYS[unit],who,turn:who==='alterna'?me:'a',start:selDay,lastDone:null,history:[],created:Date.now()}) }
     else { if(who==='alterna') who=me; await put('agenda',null,{title,date:selDay,who,done:false,by:me,created:Date.now()}) }
-    toast(rep>0?'Rutina agregada al calendario':'Tarea agregada'); $('dTitle').value=''; $('dRep').value='0';
+    toast(repeat?'Rutina agregada al calendario':'Tarea agregada'); $('dTitle').value=''; $('dMode').value='once'; $('repWrap').hidden=true;
   }
   else if(kind==='aseo'){ if(!val('name'))return; const freq=Math.max(1,Math.min(365,parseInt(val('freq'))||7)); await put('aseo',null,{name:val('name'),freq,who:val('who')||'alterna',turn:'a',lastDone:null,history:[],created:Date.now()}); $('aName').value=''; $('aName').focus() }
   else if(kind==='compra'){ if(!val('name'))return; await put('compras',null,{name:val('name'),qty:val('qty'),checked:false,by:me,created:Date.now()}); $('cName').value=''; $('cQty').value=''; $('cName').focus() }
